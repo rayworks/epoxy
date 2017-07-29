@@ -10,7 +10,7 @@ public final class EpoxyControllerAdapter extends BaseEpoxyAdapter {
   private final DiffHelper diffHelper = new DiffHelper(this, true);
   private final NotifyBlocker notifyBlocker = new NotifyBlocker();
   private final EpoxyController epoxyController;
-  private List<EpoxyModel<?>> currentModels = Collections.emptyList();
+  private ControllerModelList currentModels = new ControllerModelList(20);
   private List<EpoxyModel<?>> copyOfCurrentModels;
   private int itemCount;
 
@@ -37,7 +37,7 @@ public final class EpoxyControllerAdapter extends BaseEpoxyAdapter {
     return itemCount;
   }
 
-  void setModels(List<EpoxyModel<?>> models) {
+  void setModels(ControllerModelList models) {
     itemCount = models.size();
     copyOfCurrentModels = null;
     this.currentModels = models;
@@ -128,5 +128,17 @@ public final class EpoxyControllerAdapter extends BaseEpoxyAdapter {
   @Override
   public BoundViewHolders getBoundViewHolders() {
     return super.getBoundViewHolders();
+  }
+
+  void moveModel(int fromPosition, int toPosition) {
+    copyOfCurrentModels = null;
+
+    currentModels.pauseNotifications();
+    currentModels.add(toPosition, currentModels.remove(fromPosition));
+    currentModels.resumeNotifications();
+
+    notifyBlocker.allowChanges();
+    notifyItemMoved(fromPosition, toPosition);
+    notifyBlocker.blockChanges();
   }
 }

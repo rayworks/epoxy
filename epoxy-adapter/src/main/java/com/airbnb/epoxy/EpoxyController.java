@@ -464,6 +464,16 @@ public abstract class EpoxyController {
     }
   }
 
+  public void moveModel(int fromPosition, int toPosition) {
+    if (isBuildingModels()) {
+      throw new IllegalEpoxyUsage("Cannot call `moveModel` from inside `buildModels`");
+    }
+
+    adapter.moveModel(fromPosition, toPosition);
+
+    requestDelayedModelBuild(500);
+  }
+
   /**
    * Get the underlying adapter built by this controller. Use this to get the adapter to set on a
    * RecyclerView, or to get information about models currently in use.
